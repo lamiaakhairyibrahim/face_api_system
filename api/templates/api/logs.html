@@ -1,12 +1,12 @@
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="{{ LANGUAGE_CODE }}" dir="{% if LANGUAGE_CODE == 'ar' %}rtl{% else %}ltr{% endif %}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سجل الوصول والإنذارات - نظام التعرف على الوجه</title>
+    <title>{% trans "سجل الوصول والإنذارات - نظام التعرف على الوجه" %}</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* CSS الأساسي والستايل الزجاجي (Glassmorphism) */
         * {
             margin: 0;
             padding: 0;
@@ -185,22 +185,22 @@
 </head>
 <body>
     <div class="container">
-        <h1>سجل الوصول والتنبيهات (Access Log)</h1>
+        <h1>{% trans "سجل الوصول والتنبيهات " %}</h1>
         
         <div class="header-controls">
-            <a href="{% url 'live_stream' %}" class="nav-link">🔙 العودة للبث الحي</a>
+            <a href="{% url 'live_stream' %}" class="nav-link">{% trans "🔙 العودة للبث الحي" %}</a>
             <div class="today-count-box">
-                👥 عدد زوار اليوم: <strong>{{ today_visitors_count }}</strong>
+                {% trans "👥 عدد زوار اليوم: " %}<strong>{{ today_visitors_count }}</strong>
             </div>
         </div>
 
         <table class="access-table">
             <thead>
                 <tr>
-                    <th>التاريخ والوقت</th>
-                    <th>اسم الشخص</th>
-                    <th>نوع الحدث</th>
-                    <th>رسالة السجل</th>
+                    <th>{% trans "التاريخ والوقت" %}</th>
+                    <th>{% trans "اسم الشخص" %}</th>
+                    <th>{% trans "نوع الحدث" %}</th>
+                    <th>{% trans "رسالة السجل" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -215,22 +215,22 @@
                             </span>
                         {% else %}
                             <span class="unknown-person">
-                                ⚠️ غريب/مجهول
+                                {% trans "⚠️ غريب/مجهول" %}
                             </span>
                         {% endif %}
                     </td>
                     <td>
                         {% if log.is_recognized %}
-                            <span class="recognized-status">✅ تعرف ناجح</span>
+                            <span class="recognized-status">{% trans "✅ تعرف ناجح" %}</span>
                         {% else %}
-                            <span class="alert-status">🚨 تنبيه</span>
+                            <span class="alert-status">{% trans "🚨 تنبيه" %}</span>
                         {% endif %}
                     </td>
                     <td>{{ log.log_message }}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="4" style="text-align: center; color: #ccc;">لا توجد سجلات عرض حالياً.</td>
+                    <td colspan="4" style="text-align: center; color: #ccc;">{% trans "لا توجد سجلات عرض حالياً." %}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -238,23 +238,23 @@
 
         <div class="pagination">
             {% if logs.has_previous %}
-                <a href="?page={{ logs.previous_page_number }}" rel="prev">« السابق</a>
+                <a href="?page={{ logs.previous_page_number }}" rel="prev">{% trans "« السابق" %}</a>
             {% else %}
-                <span class="disabled">« السابق</span>
+                <span class="disabled">{% trans "« السابق" %}</span>
             {% endif %}
 
             <span class="current-page">
-                الصفحة {{ logs.number }} من {{ logs.paginator.num_pages }}
+                {% trans "الصفحة " %}{{ logs.number }}{% trans " من " %}{{ logs.paginator.num_pages }}
             </span>
             
             <span class="page-count">
-                (إجمالي {{ logs.paginator.count }} سجل)
+                ({% trans "إجمالي " %}{{ logs.paginator.count }}{% trans " سجل" %})
             </span>
 
             {% if logs.has_next %}
-                <a href="?page={{ logs.next_page_number }}" rel="next">التالي »</a>
+                <a href="?page={{ logs.next_page_number }}" rel="next">{% trans "التالي »" %}</a>
             {% else %}
-                <span class="disabled">التالي »</span>
+                <span class="disabled">{% trans "التالي »" %}</span>
             {% endif %}
         </div>
         </div>

@@ -1,0 +1,238 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-13 00:10+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+#: api/models.py:10
+msgid "اسم المكتبة"
+msgstr "Library Name"
+
+#: api/models.py:11
+msgid "وصف المكتبة"
+msgstr "Library Description"
+
+#: api/models.py:19
+msgid "المكتبة المرتبطة"
+msgstr "Associated Library"
+
+#: api/models.py:21 api/templates/api/logs.html:202
+msgid "اسم الشخص"
+msgstr "Person Name"
+
+#: api/models.py:22
+msgid "وصف إضافي"
+msgstr "Additional Description"
+
+#: api/models.py:23
+msgid "صورة الوجه"
+msgstr "Face Image"
+
+#: api/models.py:24
+msgid "التمثيل الرقمي (Embedding)"
+msgstr "Face Embedding"
+
+#: api/models.py:25
+msgid "هل تم استخراج الـ Embedding؟"
+msgstr "Is Embedding Extracted?"
+
+#: api/models.py:32
+msgid "الشخص المعرف عليه"
+msgstr "Recognized Person"
+
+#: api/models.py:33
+msgid "تاريخ ووقت الحدث"
+msgstr "Event Date and Time"
+
+#: api/models.py:34
+msgid "هل تم التعرف عليه؟"
+msgstr "Was Recognized?"
+
+#: api/models.py:35
+msgid "صورة اللقطة"
+msgstr "Snapshot Image"
+
+#: api/models.py:36 api/templates/api/logs.html:204
+msgid "رسالة السجل"
+msgstr "Log Message"
+
+#: api/templates/api/index.html:8
+msgid "نظام التعرف على الوجه الحي - مراقبة متقدمة"
+msgstr "Live Face Recognition System - Advanced Monitoring"
+
+#: api/templates/api/index.html:326
+msgid "نظام التعرف على الوجه - المراقبة الحية"
+msgstr "Face Recognition System - Live Monitoring"
+
+#: api/templates/api/index.html:350
+msgid "الحالة:"
+msgstr "Status:"
+
+#: api/templates/api/index.html:350
+msgid "غير متصل"
+msgstr "Disconnected"
+
+#: api/templates/api/index.html:353
+msgid " الوقت الحالي: "
+msgstr "Current Time: "
+
+#: api/templates/api/index.html:358
+msgid " تسجيل الخروج"
+msgstr "Logout"
+
+#: api/templates/api/index.html:359
+msgid " سجلات التنبيهات"
+msgstr "Alert Logs"
+
+#: api/templates/api/index.html:370
+msgid "🎬 معدل الإطارات: "
+msgstr "🎬 Frame Rate: "
+
+#: api/templates/api/index.html:371
+msgid "👤 الوجوه المكتشفة: "
+msgstr "👤 Detected Faces: "
+
+#: api/templates/api/index.html:376
+msgid " سجل الكشف اللحظي"
+msgstr "Live Detection Log"
+
+#: api/templates/api/index.html:379
+msgid "بانتظار الاتصال..."
+msgstr "Waiting for Connection..."
+
+#: api/templates/api/index.html:380
+msgid "جارٍ تحميل النظام وإعداد الاتصال"
+msgstr "System Loading and Preparing Connection"
+
+#: api/templates/api/logs.html:7
+msgid "سجل الوصول والإنذارات - نظام التعرف على الوجه"
+msgstr "Access and Alerts Log - Face Recognition System"
+
+#: api/templates/api/logs.html:189
+msgid "سجل الوصول والتنبيهات "
+msgstr "Access and Alerts Log"
+
+#: api/templates/api/logs.html:192
+msgid "🔙 العودة للبث الحي"
+msgstr "🔙 Back to Live Stream"
+
+#: api/templates/api/logs.html:194
+msgid "👥 عدد زوار اليوم: "
+msgstr "👥 Today's Visitors: "
+
+#: api/templates/api/logs.html:201
+msgid "التاريخ والوقت"
+msgstr "Date and Time"
+
+#: api/templates/api/logs.html:203
+msgid "نوع الحدث"
+msgstr "Event Type"
+
+#: api/templates/api/logs.html:219
+msgid "⚠️ غريب/مجهول"
+msgstr "⚠️ Unknown/Stranger"
+
+#: api/templates/api/logs.html:225
+msgid "✅ تعرف ناجح"
+msgstr "✅ Successful Recognition"
+
+#: api/templates/api/logs.html:227
+msgid "🚨 تنبيه"
+msgstr "🚨 Alert"
+
+#: api/templates/api/logs.html:234
+msgid "لا توجد سجلات عرض حالياً."
+msgstr "No Logs Available."
+
+#: api/templates/api/logs.html:242 api/templates/api/logs.html:244
+msgid "« السابق"
+msgstr "« Previous"
+
+#: api/templates/api/logs.html:248
+msgid "الصفحة "
+msgstr "Page "
+
+#: api/templates/api/logs.html:248
+msgid " من "
+msgstr " of "
+
+#: api/templates/api/logs.html:252
+msgid "إجمالي "
+msgstr "Total "
+
+#: api/templates/api/logs.html:252
+msgid " سجل"
+msgstr " Records"
+
+#: api/templates/api/logs.html:256 api/templates/api/logs.html:258
+msgid "التالي »"
+msgstr "Next »"
+
+#: face_ai/settings.py:99
+msgid "Arabic"
+msgstr "Arabic"
+
+#: face_ai/settings.py:100
+msgid "English"
+msgstr "English"
+
+#: templates/login.html:7
+msgid "تسجيل الدخول للنظام"
+msgstr "Login to the System"
+
+#: templates/login.html:112
+msgid "تسجيل الدخول"
+msgstr "Login"
+
+#: templates/login.html:115
+msgid " اسم المستخدم أو كلمة المرور غير صحيحة."
+msgstr "Incorrect username or password."
+
+#: templates/login.html:121
+msgid "اسم المستخدم"
+msgstr "Username"
+
+#: templates/login.html:122
+msgid "أدخل اسم المستخدم"
+msgstr "Enter Username"
+
+#: templates/login.html:124
+msgid "كلمة المرور"
+msgstr "Password"
+
+#: templates/login.html:125
+msgid "أدخل كلمة المرور"
+msgstr "Enter Password"
+
+#: templates/login.html:129
+msgid "دخول النظام"
+msgstr "Access the System"
+
+msgid "تم الاتصال بالنظام بنجاح"
+msgstr "Successfully connected to the system"
+
+
+msgid "حدث خطأ في الاتصال"
+msgstr "Connection Error Occurred"
+
+msgid "تم تشغيل الكاميرا بنجاح"
+msgstr "Camera Started Successfully"
+
+msgid "تعذر الوصول إلى الكاميرا. تأكد من السماح بالوصول."
+msgstr "Unable to access the camera. Please ensure permission is granted."
+
+msgid "تم الكشف عن: "
+msgstr "Detected: "

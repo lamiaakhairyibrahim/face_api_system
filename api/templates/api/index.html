@@ -1,9 +1,11 @@
+{% load i18n %}
+<script src="{% url 'javascript-catalog' %}"></script>
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="{{ LANGUAGE_CODE }}" dir="{% if LANGUAGE_CODE == 'ar' %}rtl{% else %}ltr{% endif %}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام التعرف على الوجه الحي - مراقبة متقدمة</title>
+    <title>{% trans "نظام التعرف على الوجه الحي - مراقبة متقدمة" %}</title>
     <style>
         * {
             margin: 0;
@@ -29,7 +31,42 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
+        .language-switcher-form {
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        .language-switcher-form select {
+            padding: 10px 25px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            font-weight: 600;
+            
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            cursor: pointer;
+            text-align: center;
+            min-width: 150px;
+            
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23ffffff'%3E%3Cpath d='M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 6.757 7.586 5.343 9z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: calc(100% - 10px) center;
+            background-size: 16px;
+        }
 
+        .language-switcher-form select:hover {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .language-switcher-form option {
+            color: #333;
+            background-color: #f0f0f0;
+        }
         h1 { 
             font-size: 2.5em;
             font-weight: 700;
@@ -286,21 +323,40 @@
 </head>
 <body>
     <div class="header">
-        <h1>نظام التعرف على الوجه - المراقبة الحية</h1>
-        
+        <h1>{% trans "نظام التعرف على الوجه - المراقبة الحية" %}</h1>
+        <form action="{% url 'set_language' %}" method="post" class="language-switcher-form">
+            {% csrf_token %}
+            <input name="next" type="hidden" value="{{ request.get_full_path }}">
+            
+            <select name="language" onchange="this.form.submit()">
+                {% get_current_language as LANGUAGE_CODE %}
+                {% get_available_languages as LANGUAGES %}
+                {% get_language_info_list for LANGUAGES as languages %}
+                
+                {% for lang in languages %}
+                    <option value="{{ lang.code }}" {% if lang.code == LANGUAGE_CODE %}selected{% endif %}>
+                        {% if lang.code == 'ar' %}
+                            العربية 🇸🇦
+                        {% else %}
+                            English 🇺🇸
+                        {% endif %}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
         <div class="status-bar">
             <div class="status-item">
                 <div class="status-dot" id="status-dot"></div>
-                <span>الحالة: <strong id="ws-status">غير متصل</strong></span>
+                <span>{% trans "الحالة:" %} <strong id="ws-status">{% trans "غير متصل" %}</strong></span>
             </div>
             <div class="status-item">
-                <span> الوقت الحالي: <strong id="current-time">--:--:--</strong></span>
+                <span>{% trans " الوقت الحالي: " %}<strong id="current-time">--:--:--</strong></span>
             </div>
         </div>
 
         <div class="nav-links">
-            <a href="{% url 'logout' %}"> تسجيل الخروج</a>
-            <a href="{% url 'access_logs' %}"> سجلات التنبيهات</a>
+            <a href="{% url 'logout' %}">{% trans " تسجيل الخروج" %}</a>
+            <a href="{% url 'access_logs' %}">{% trans " سجلات التنبيهات" %}</a>
         </div>
     </div>
 
@@ -311,23 +367,24 @@
                 <canvas id="canvasOverlay"></canvas>
             </div>
             <div class="video-info">
-                <span>🎬 معدل الإطارات: <strong id="fps-display">5 FPS</strong></span>
-                <span>👤 الوجوه المكتشفة: <strong id="face-count">0</strong></span>
+                <span>{% trans "🎬 معدل الإطارات: " %}<strong id="fps-display">5 FPS</strong></span>
+                <span>{% trans "👤 الوجوه المكتشفة: " %}<strong id="face-count">0</strong></span>
             </div>
         </div>
 
         <div class="log-box">
-            <h2> سجل الكشف اللحظي</h2>
+            <h2>{% trans " سجل الكشف اللحظي" %}</h2>
             <div class="log-content" id="realtime-log">
                 <div class="log-entry system-update">
-                    <span class="log-time">⏳ بانتظار الاتصال...</span>
-                    <span>جارٍ تحميل النظام وإعداد الاتصال</span>
+                    <span class="log-time">{% trans "بانتظار الاتصال..." %}</span>
+                    <span>{% trans "جارٍ تحميل النظام وإعداد الاتصال" %}</span>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        const _ = gettext;
         const video = document.getElementById('videoElement');
         const canvas = document.getElementById('canvasOverlay');
         const ctx = canvas.getContext('2d');
@@ -348,26 +405,26 @@
         }, 1000);
 
         ws.onopen = () => {
-            wsStatus.textContent = 'متصل';
+            wsStatus.textContent = _('متصل');
             statusDot.className = 'status-dot status-connected';
             console.log("WebSocket connected!");
             
             logContainer.innerHTML = ''; 
-            addSystemLog('✅ تم الاتصال بالنظام بنجاح');
+            addSystemLog(_('تم الاتصال بالنظام بنجاح'));
             startStreaming();
             startTracking();
         };
 
         ws.onclose = () => {
-            wsStatus.textContent = 'غير متصل';
+            wsStatus.textContent = _('غير متصل');
             statusDot.className = 'status-dot status-disconnected';
             console.error("WebSocket closed. Retrying...");
-            addSystemLog('⚠️ انقطع الاتصال بالنظام');
+            addSystemLog(_('انقطع الاتصال بالنظام'));
         };
 
         ws.onerror = (error) => {
             console.error("WebSocket error:", error);
-            addSystemLog('❌ حدث خطأ في الاتصال');
+            addSystemLog('حدث خطأ في الاتصال');
         };
         
         ws.onmessage = (event) => {
@@ -389,13 +446,13 @@
                     video.play();
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
-                    addSystemLog('📹 تم تشغيل الكاميرا بنجاح');
+                    addSystemLog(_('تم تشغيل الكاميرا بنجاح'));
                 };
             })
             .catch(err => {
                 console.error("Error accessing camera:", err);
-                alert("تعذر الوصول إلى الكاميرا. تأكد من السماح بالوصول.");
-                addSystemLog('❌ فشل الوصول إلى الكاميرا');
+                alert(_("تعذر الوصول إلى الكاميرا. تأكد من السماح بالوصول."));
+                addSystemLog(_('فشل الوصول إلى الكاميرا'));
             });
 
         function sendFrame() {
@@ -422,7 +479,7 @@
                 trackedFaces[name] = {
                     location: location,
                     lastSeen: currentTime,
-                    isStranger: name === "Stranger"
+                    isStranger: name === _("Stranger")
                 };
             });
         }
@@ -491,7 +548,7 @@
                 message.className = 'log-entry ' + logClass;
                 message.innerHTML = `
                     <span class="log-time">${icon} ${time}</span>
-                    <span>تم الكشف عن: <span class="log-name">${name}</span></span>
+                    <span>${gettext("تم الكشف عن: ")} <span class="log-name">${name}</span></span>
                 `;
                 
                 logContainer.prepend(message);

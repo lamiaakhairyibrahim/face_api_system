@@ -40,7 +40,6 @@ class StreamConsumer(AsyncWebsocketConsumer):
         print(f"WebSocket Disconnected with code: {close_code}")
         
     def load_known_faces(self):
-        """ تحميل الـ embeddings والأسماء من قاعدة البيانات. """
         global KNOWN_FACES_DATA
         
         connection.close() 
@@ -75,8 +74,7 @@ class StreamConsumer(AsyncWebsocketConsumer):
 
 
     def process_frame_and_recognize(self, image_data_b64):
-        """ يتم تشغيلها بواسطة sync_to_async """
-        
+
         img_bytes = base64.b64decode(image_data_b64)
         np_arr = np.frombuffer(img_bytes, np.uint8)
         frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
@@ -118,8 +116,6 @@ class StreamConsumer(AsyncWebsocketConsumer):
         return results
 
     async def reload_ai_library(self, event):
-        """ يتم استدعاؤها من Celery لتحديث الـ embeddings. """
-
         await sync_to_async(self.load_known_faces)()
 
         await self.send(text_data=json.dumps({

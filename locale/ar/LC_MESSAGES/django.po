@@ -1,0 +1,240 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-13 00:10+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+
+#: api/models.py:10
+msgid "اسم المكتبة"
+msgstr "اسم المكتبة"
+
+#: api/models.py:11
+msgid "وصف المكتبة"
+msgstr "وصف المكتبة"
+
+#: api/models.py:19
+msgid "المكتبة المرتبطة"
+msgstr "المكتبة المرتبطة"
+
+#: api/models.py:21 api/templates/api/logs.html:202
+msgid "اسم الشخص"
+msgstr "اسم الشخص"
+
+#: api/models.py:22
+msgid "وصف إضافي"
+msgstr "وصف إضافي"
+
+#: api/models.py:23
+msgid "صورة الوجه"
+msgstr "صورة الوجه"
+
+#: api/models.py:24
+msgid "التمثيل الرقمي (Embedding)"
+msgstr "التمثيل الرقمي (Embedding)"
+
+#: api/models.py:25
+msgid "هل تم استخراج الـ Embedding؟"
+msgstr "هل تم استخراج الـ Embedding؟"
+
+#: api/models.py:32
+msgid "الشخص المعرف عليه"
+msgstr "الشخص المعرف عليه"
+
+#: api/models.py:33
+msgid "تاريخ ووقت الحدث"
+msgstr "تاريخ ووقت الحدث"
+
+#: api/models.py:34
+msgid "هل تم التعرف عليه؟"
+msgstr "هل تم التعرف عليه؟"
+
+#: api/models.py:35
+msgid "صورة اللقطة"
+msgstr "صورة اللقطة"
+
+#: api/models.py:36 api/templates/api/logs.html:204
+msgid "رسالة السجل"
+msgstr "رسالة السجل"
+
+#: api/templates/api/index.html:8
+msgid "نظام التعرف على الوجه الحي - مراقبة متقدمة"
+msgstr "نظام التعرف على الوجه الحي - مراقبة متقدمة"
+
+#: api/templates/api/index.html:326
+msgid "نظام التعرف على الوجه - المراقبة الحية"
+msgstr "نظام التعرف على الوجه - المراقبة الحية"
+
+#: api/templates/api/index.html:350
+msgid "الحالة:"
+msgstr "الحالة:"
+
+#: api/templates/api/index.html:350
+msgid "غير متصل"
+msgstr "غير متصل"
+
+#: api/templates/api/index.html:353
+msgid " الوقت الحالي: "
+msgstr " الوقت الحالي: "
+
+#: api/templates/api/index.html:358
+msgid " تسجيل الخروج"
+msgstr " تسجيل الخروج"
+
+#: api/templates/api/index.html:359
+msgid " سجلات التنبيهات"
+msgstr " سجلات التنبيهات"
+
+#: api/templates/api/index.html:370
+msgid "🎬 معدل الإطارات: "
+msgstr "🎬 معدل الإطارات: "
+
+#: api/templates/api/index.html:371
+msgid "👤 الوجوه المكتشفة: "
+msgstr "👤 الوجوه المكتشفة: "
+
+#: api/templates/api/index.html:376
+msgid " سجل الكشف اللحظي"
+msgstr " سجل الكشف اللحظي"
+
+#: api/templates/api/index.html:379
+msgid "بانتظار الاتصال..."
+msgstr "بانتظار الاتصال..."
+
+#: api/templates/api/index.html:380
+msgid "جارٍ تحميل النظام وإعداد الاتصال"
+msgstr "جارٍ تحميل النظام وإعداد الاتصال"
+
+#: api/templates/api/logs.html:7
+msgid "سجل الوصول والإنذارات - نظام التعرف على الوجه"
+msgstr "سجل الوصول والإنذارات - نظام التعرف على الوجه"
+
+#: api/templates/api/logs.html:189
+msgid "سجل الوصول والتنبيهات "
+msgstr "سجل الوصول والتنبيهات "
+
+#: api/templates/api/logs.html:192
+msgid "🔙 العودة للبث الحي"
+msgstr "🔙 العودة للبث الحي"
+
+#: api/templates/api/logs.html:194
+msgid "👥 عدد زوار اليوم: "
+msgstr "👥 عدد زوار اليوم: "
+
+#: api/templates/api/logs.html:201
+msgid "التاريخ والوقت"
+msgstr "التاريخ والوقت"
+
+#: api/templates/api/logs.html:203
+msgid "نوع الحدث"
+msgstr "نوع الحدث"
+
+#: api/templates/api/logs.html:219
+msgid "⚠️ غريب/مجهول"
+msgstr "⚠️ غريب/مجهول"
+
+#: api/templates/api/logs.html:225
+msgid "✅ تعرف ناجح"
+msgstr "✅ تعرف ناجح"
+
+#: api/templates/api/logs.html:227
+msgid "🚨 تنبيه"
+msgstr "🚨 تنبيه"
+
+#: api/templates/api/logs.html:234
+msgid "لا توجد سجلات عرض حالياً."
+msgstr "لا توجد سجلات عرض حالياً."
+
+#: api/templates/api/logs.html:242 api/templates/api/logs.html:244
+msgid "« السابق"
+msgstr "« السابق"
+
+#: api/templates/api/logs.html:248
+msgid "الصفحة "
+msgstr "الصفحة "
+
+#: api/templates/api/logs.html:248
+msgid " من "
+msgstr " من "
+
+#: api/templates/api/logs.html:252
+msgid "إجمالي "
+msgstr "إجمالي "
+
+#: api/templates/api/logs.html:252
+msgid " سجل"
+msgstr " سجل"
+
+#: api/templates/api/logs.html:256 api/templates/api/logs.html:258
+msgid "التالي »"
+msgstr "التالي »"
+
+#: face_ai/settings.py:99
+msgid "Arabic"
+msgstr "العربية"
+
+#: face_ai/settings.py:100
+msgid "English"
+msgstr "الإنجليزية"
+
+#: templates/login.html:7
+msgid "تسجيل الدخول للنظام"
+msgstr "تسجيل الدخول للنظام"
+
+#: templates/login.html:112
+msgid "تسجيل الدخول"
+msgstr "تسجيل الدخول"
+
+#: templates/login.html:115
+msgid " اسم المستخدم أو كلمة المرور غير صحيحة."
+msgstr " اسم المستخدم أو كلمة المرور غير صحيحة."
+
+#: templates/login.html:121
+msgid "اسم المستخدم"
+msgstr "اسم المستخدم"
+
+#: templates/login.html:122
+msgid "أدخل اسم المستخدم"
+msgstr "أدخل اسم المستخدم"
+
+#: templates/login.html:124
+msgid "كلمة المرور"
+msgstr "كلمة المرور"
+
+#: templates/login.html:125
+msgid "أدخل كلمة المرور"
+msgstr "أدخل كلمة المرور"
+
+#: templates/login.html:129
+msgid "دخول النظام"
+msgstr "دخول النظام"
+
+msgid "تم الاتصال بالنظام بنجاح"
+msgstr "تم الاتصال بالنظام بنجاح"
+
+
+msgid "حدث خطأ في الاتصال"
+msgstr "حدث خطأ في الاتصال"
+
+msgid "تم تشغيل الكاميرا بنجاح"
+msgstr "تم تشغيل الكاميرا بنجاح"
+
+msgid "تعذر الوصول إلى الكاميرا. تأكد من السماح بالوصول."
+msgstr "تعذر الوصول إلى الكاميرا. تأكد من السماح بالوصول."
+
+msgid "تم الكشف عن: "
+msgstr "تم الكشف عن: "

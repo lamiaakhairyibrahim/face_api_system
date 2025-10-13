@@ -1,0 +1,63 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-13 00:39+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: api/templates/api/index.html:408
+msgid "متصل"
+msgstr "Connected"
+
+#: api/templates/api/index.html:413
+msgid "تم الاتصال بالنظام بنجاح"
+msgstr "System connected successfully"
+
+#: api/templates/api/index.html:419
+msgid "غير متصل"
+msgstr "Disconnected"
+
+#: api/templates/api/index.html:422
+msgid "انقطع الاتصال بالنظام"
+msgstr "System disconnected"
+
+#: api/templates/api/index.html:449
+msgid "تم تشغيل الكاميرا بنجاح"
+msgstr "Camera started successfully"
+
+#: api/templates/api/index.html:454
+msgid "تعذر الوصول إلى الكاميرا. تأكد من السماح بالوصول."
+msgstr "Cannot access camera. Ensure access is allowed."
+
+#: api/templates/api/index.html:455
+msgid "فشل الوصول إلى الكاميرا"
+msgstr "Failed to access camera"
+
+#: api/templates/api/index.html:482
+msgid "Stranger"
+msgstr "Stranger"
+
+#: api/templates/api/index.html:551
+msgid "تم الكشف عن: "
+msgstr "Detected: "
+
+#: face_ai/settings.py:99
+msgid "Arabic"
+msgstr "Arabic"
+
+#: face_ai/settings.py:100
+msgid "English"
+msgstr "English"
