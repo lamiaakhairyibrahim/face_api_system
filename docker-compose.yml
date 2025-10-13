@@ -1,0 +1,66 @@
+
+services:
+  db:
+    image: postgres:14-alpine
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:6-alpine
+    container_name: redis_broker
+    expose:
+      - 6379
+  app:
+    build: .
+    container_name: django_app
+    restart: always
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - REDIS_HOST=redis
+    
+    depends_on:
+      redis:
+        condition: service_started
+      db:
+        condition: service_healthy
+    
+    command: sh -c "python manage.py migrate && python manage.py collectstatic --noinput && daphne face_ai.asgi:application -b 0.0.0.0 -p 8000"
+    
+    volumes:
+      - media_files:/app/media
+    ports:
+      - "8000:8000"
+
+  worker:
+    build: .
+    container_name: celery_worker
+    command: celery -A face_ai worker -l info 
+    environment:
+      - POSTGRES_HOST=db
+      - REDIS_HOST=redis
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_PORT=5432
+    volumes:
+      - media_files:/app/media
+    depends_on:
+      - app
+
+volumes:
+  postgres_data:
+  media_files:

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سجل الوصول والإنذارات - نظام التعرف على الوجه</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS الأساسي والستايل الزجاجي (Glassmorphism) */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body { 
+            font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 30px 20px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 { 
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 25px;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(to right, #fff, #e0e7ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .today-count-box {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .today-count-box strong {
+            color: #4ade80;
+            font-size: 1.2em;
+            margin-left: 5px;
+        }
+        .nav-link {
+            /* تم حذف: display: inline-block; و margin-bottom: 25px; */
+            padding: 10px 25px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .access-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .access-table th, .access-table td {
+            padding: 15px;
+            text-align: right;
+            border: none;
+        }
+
+        .access-table th {
+            background-color: rgba(59, 130, 246, 0.8);
+            color: #fff;
+            font-weight: 700;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .access-table tr {
+            transition: background-color 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .access-table tr:nth-child(even) {
+             background: rgba(0, 0, 0, 0.1);
+        }
+        
+        .access-table tr:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .recognized-status { color: #10b981; font-weight: 600; }
+        .alert-status { color: #ef4444; font-weight: 600; }
+        .unknown-person { color: #f59e0b; font-weight: 600; }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+        }
+
+        .pagination a, .pagination span {
+            display: block;
+            padding: 10px 18px;
+            text-decoration: none;
+            color: #fff;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .pagination a {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .pagination a:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .pagination .current-page {
+            background-color: #3b82f6;
+            border: 1px solid #3b82f6;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        .pagination .disabled {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: not-allowed;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            .access-table, .access-table thead, .access-table tbody, .access-table th, .access-table td, .access-table tr { display: block; }
+            .access-table thead tr { position: absolute; top: -9999px; left: -9999px; }
+            .access-table tr { margin-bottom: 15px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 10px; background: rgba(255, 255, 255, 0.1); }
+            .access-table td { border: none; position: relative; padding-right: 50%; text-align: left; }
+            .access-table td:before { position: absolute; right: 6px; padding-left: 10px; white-space: nowrap; font-weight: bold; color: #ccc; }
+            .access-table tr td:nth-of-type(1):before { content: "التاريخ والوقت:"; }
+            .access-table tr td:nth-of-type(2):before { content: "اسم الشخص:"; }
+            .access-table tr td:nth-of-type(3):before { content: "نوع الحدث:"; }
+            .access-table tr td:nth-of-type(4):before { content: "رسالة السجل:"; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>سجل الوصول والتنبيهات (Access Log)</h1>
+        
+        <div class="header-controls">
+            <a href="{% url 'live_stream' %}" class="nav-link">🔙 العودة للبث الحي</a>
+            <div class="today-count-box">
+                👥 عدد زوار اليوم: <strong>{{ today_visitors_count }}</strong>
+            </div>
+        </div>
+
+        <table class="access-table">
+            <thead>
+                <tr>
+                    <th>التاريخ والوقت</th>
+                    <th>اسم الشخص</th>
+                    <th>نوع الحدث</th>
+                    <th>رسالة السجل</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr class="{% if log.is_recognized %}recognized-row{% else %}alert-row{% endif %}">
+                    <td>{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
+                    <td>
+                        {% if log.profile %}
+                            <span class="recognized-status">
+                                {{ log.profile.name }} 
+                                <small>({{ log.profile.library.name }})</small>
+                            </span>
+                        {% else %}
+                            <span class="unknown-person">
+                                ⚠️ غريب/مجهول
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if log.is_recognized %}
+                            <span class="recognized-status">✅ تعرف ناجح</span>
+                        {% else %}
+                            <span class="alert-status">🚨 تنبيه</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ log.log_message }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="text-align: center; color: #ccc;">لا توجد سجلات عرض حالياً.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            {% if logs.has_previous %}
+                <a href="?page={{ logs.previous_page_number }}" rel="prev">« السابق</a>
+            {% else %}
+                <span class="disabled">« السابق</span>
+            {% endif %}
+
+            <span class="current-page">
+                الصفحة {{ logs.number }} من {{ logs.paginator.num_pages }}
+            </span>
+            
+            <span class="page-count">
+                (إجمالي {{ logs.paginator.count }} سجل)
+            </span>
+
+            {% if logs.has_next %}
+                <a href="?page={{ logs.next_page_number }}" rel="next">التالي »</a>
+            {% else %}
+                <span class="disabled">التالي »</span>
+            {% endif %}
+        </div>
+        </div>
+</body>
+</html>
