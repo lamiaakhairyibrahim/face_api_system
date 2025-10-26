@@ -1,11 +1,13 @@
-from face_ai.celery import app
+from django.utils import timezone
+
 from celery import shared_task
-from .ai_utils import get_face_embedding
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from datetime import timedelta
 
-from django.utils import timezone
+from .ai_utils import get_face_embedding
+from face_ai.celery import app
+
 
 @app.task
 def calculate_embedding_task(profile_id):

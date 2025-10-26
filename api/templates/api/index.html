@@ -176,14 +176,6 @@
             display: block;
         }
         
-        #canvasOverlay { 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            z-index: 10;
-            width: 100%; 
-            height: 100%;
-        }
 
         .video-info {
             margin-top: 15px;
@@ -364,7 +356,7 @@
         <div class="video-box">
             <div class="video-container"> 
                 <video id="videoElement" autoplay muted></video>
-                <canvas id="canvasOverlay"></canvas>
+                <img id="processedFrame" src="" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;">
             </div>
             <div class="video-info">
                 <span>{% trans "🎬 معدل الإطارات: " %}<strong id="fps-display">5 FPS</strong></span>
@@ -383,69 +375,105 @@
         </div>
     </div>
 
-    <script>
+
+<script>
         const _ = gettext;
         const video = document.getElementById('videoElement');
-        const canvas = document.getElementById('canvasOverlay');
-        const ctx = canvas.getContext('2d');
+        const processedFrame = document.getElementById('processedFrame');
         const logContainer = document.getElementById('realtime-log');
         const wsStatus = document.getElementById('ws-status');
         const statusDot = document.getElementById('status-dot');
         const faceCountDisplay = document.getElementById('face-count');
         const currentTimeDisplay = document.getElementById('current-time');
 
-        const ws = new WebSocket(`ws://${window.location.host}/ws/ai/stream/`);
-        const FPS = 5;
-        const trackedFaces = {};
-        const FACE_TIMEOUT = 3000;
+        let ws = null;
+        let streamInterval = null;
+        let mediaStream = null;
+        let tempCanvas = null;
+        let tempCtx = null;
+        const FPS = 15;
 
-        // Update current time
         setInterval(() => {
             currentTimeDisplay.textContent = new Date().toLocaleTimeString('ar-EG');
         }, 1000);
 
-        ws.onopen = () => {
-            wsStatus.textContent = _('متصل');
-            statusDot.className = 'status-dot status-connected';
-            console.log("WebSocket connected!");
+        function initWebSocket() {
+            ws = new WebSocket(`ws://${window.location.host}/ws/ai/stream/`);
             
-            logContainer.innerHTML = ''; 
-            addSystemLog(_('تم الاتصال بالنظام بنجاح'));
-            startStreaming();
-            startTracking();
-        };
+            ws.onopen = () => {
+                wsStatus.textContent = _('متصل');
+                statusDot.className = 'status-dot status-connected';
+                console.log("WebSocket connected!");
+                
+                logContainer.innerHTML = ''; 
+                addSystemLog(_('تم الاتصال بالنظام بنجاح'));
+                startStreaming();
+            };
 
-        ws.onclose = () => {
-            wsStatus.textContent = _('غير متصل');
-            statusDot.className = 'status-dot status-disconnected';
-            console.error("WebSocket closed. Retrying...");
-            addSystemLog(_('انقطع الاتصال بالنظام'));
-        };
+            ws.onclose = () => {
+                wsStatus.textContent = _('غير متصل');
+                statusDot.className = 'status-dot status-disconnected';
+                console.error("WebSocket closed.");
+                addSystemLog(_('انقطع الاتصال بالنظام'));
+                stopStreaming();
+                
+                setTimeout(() => {
+                    addSystemLog(_('جارٍ محاولة إعادة الاتصال...'));
+                    initWebSocket();
+                }, 3000);
+            };
 
-        ws.onerror = (error) => {
-            console.error("WebSocket error:", error);
-            addSystemLog('حدث خطأ في الاتصال');
-        };
-        
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
+            ws.onerror = (error) => {
+                console.error("WebSocket error:", error);
+                addSystemLog('حدث خطأ في الاتصال');
+            };
+            
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.frame) {
+                        processedFrame.src = 'data:image/jpeg;base64,' + data.frame;
+                        processedFrame.style.display = 'block';
+                        
+                        if (data.detections && data.detections.length > 0) {
+                            updateRealtimeLog(data.detections);
+                            faceCountDisplay.textContent = data.detections.length;
+                        } else {
+                            faceCountDisplay.textContent = '0';
+                        }
+                        
+                        console.log('Frame received with', data.detections ? data.detections.length : 0, 'detections');
+                    } else if (data.type === 'status_update') {
+                        addSystemLog(data.message);
+                    }
+                } catch (e) {
+                    console.error("Error parsing message:", e);
+                }
+            };
+        }
 
-            if (data.detections) {
-                updateTrackedFaces(data.detections);
-                updateRealtimeLog(data.detections);
-                faceCountDisplay.textContent = data.detections.length;
-            } else if (data.type === 'status_update') {
-                addSystemLog(data.message);
-            }
-        };
-        
-        navigator.mediaDevices.getUserMedia({ video: true })
+        function initCamera() {
+            navigator.mediaDevices.getUserMedia({ 
+                video: {
+                    width: { ideal: 640 },
+                    height: { ideal: 480 },
+                    frameRate: { ideal: 15, max: 30 }
+                } 
+            })
             .then(stream => {
+                mediaStream = stream;
                 video.srcObject = stream;
+                
                 video.onloadedmetadata = () => {
                     video.play();
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
+                    
+                    if (!tempCanvas) {
+                        tempCanvas = document.createElement('canvas');
+                        tempCanvas.width = video.videoWidth;
+                        tempCanvas.height = video.videoHeight;
+                        tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
+                    }
+                    
                     addSystemLog(_('تم تشغيل الكاميرا بنجاح'));
                 };
             })
@@ -454,105 +482,70 @@
                 alert(_("تعذر الوصول إلى الكاميرا. تأكد من السماح بالوصول."));
                 addSystemLog(_('فشل الوصول إلى الكاميرا'));
             });
+        }
 
         function sendFrame() {
-            if (ws.readyState === WebSocket.OPEN && video.readyState === video.HAVE_ENOUGH_DATA) {
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                
-                const frame_b64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
-                
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                console.log('WebSocket not ready');
+                return;
+            }
+            
+            if (!video || video.readyState !== video.HAVE_ENOUGH_DATA) {
+                console.log('Video not ready');
+                return;
+            }
+            
+            try {
+                tempCtx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
+                const frame_b64 = tempCanvas.toDataURL('image/jpeg', 0.7).split(',')[1];
                 ws.send(JSON.stringify({ frame: frame_b64 }));
+                console.log('Frame sent successfully');
+            } catch (e) {
+                console.error("Error sending frame:", e);
             }
         }
 
         function startStreaming() {
-            setInterval(sendFrame, 1000 / FPS);
+            if (streamInterval) {
+                clearInterval(streamInterval);
+            }
+            streamInterval = setInterval(sendFrame, 1000 / FPS);
         }
 
-        function updateTrackedFaces(detections) {
-            const currentTime = Date.now();
+        function stopStreaming() {
+            if (streamInterval) {
+                clearInterval(streamInterval);
+                streamInterval = null;
+            }
+        }
+
+        function cleanup() {
+            stopStreaming();
             
-            detections.forEach(detection => {
-                const name = detection.name;
-                const location = detection.location;
-                
-                trackedFaces[name] = {
-                    location: location,
-                    lastSeen: currentTime,
-                    isStranger: name === _("Stranger")
-                };
-            });
-        }
-
-        function drawAllTrackedFaces() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (ws) {
+                ws.close();
+                ws = null;
+            }
             
-            const currentTime = Date.now();
-            
-            Object.keys(trackedFaces).forEach(name => {
-                const face = trackedFaces[name];
-                
-                if (currentTime - face.lastSeen > FACE_TIMEOUT) {
-                    delete trackedFaces[name];
-                    return;
-                }
-                
-                const [top, right, bottom, left] = face.location;
-                const boxX = left;
-                const boxY = top;
-                const boxWidth = right - left;
-                const boxHeight = bottom - top;
-                
-                const timeSinceLastSeen = currentTime - face.lastSeen;
-                const opacity = Math.max(0, 1 - (timeSinceLastSeen / FACE_TIMEOUT));
-                
-                ctx.globalAlpha = opacity;
-                
-                // Draw shadow
-                ctx.shadowColor = face.isStranger ? '#ef4444' : '#10b981';
-                ctx.shadowBlur = 15;
-                
-                ctx.strokeStyle = face.isStranger ? '#ef4444' : '#10b981';
-                ctx.lineWidth = 4;
-                ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
-
-                // Draw label background
-                ctx.shadowBlur = 0;
-                ctx.fillStyle = face.isStranger ? '#ef4444' : '#10b981';
-                const labelPadding = 10;
-                const labelHeight = 35;
-                ctx.fillRect(boxX, boxY - labelHeight, boxWidth, labelHeight);
-
-                // Draw name
-                ctx.fillStyle = '#fff';
-                ctx.font = 'bold 20px Cairo, Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText(name, boxX + boxWidth / 2, boxY - 10);
-                
-                ctx.globalAlpha = 1.0;
-            });
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+                mediaStream = null;
+            }
         }
 
-        function startTracking() {
-            setInterval(drawAllTrackedFaces, 50);
-        }
-        
         function updateRealtimeLog(detections) {
             detections.forEach(detection => {
                 const name = detection.name;
-                const logClass = name === "Stranger" ? 'stranger' : 'recognized';
+                const logClass = detection.is_recognized ? 'recognized' : 'stranger';
                 const time = new Date().toLocaleTimeString('ar-EG');
-                const icon = name === "Stranger" ? '⚠️' : '✅';
-                
+                const icon = detection.is_recognized ? '✅' : '⚠️';
                 const message = document.createElement('div');
                 message.className = 'log-entry ' + logClass;
                 message.innerHTML = `
                     <span class="log-time">${icon} ${time}</span>
                     <span>${gettext("تم الكشف عن: ")} <span class="log-name">${name}</span></span>
                 `;
-                
                 logContainer.prepend(message);
-                
                 if (logContainer.children.length > 30) {
                     logContainer.removeChild(logContainer.lastElementChild);
                 }
@@ -563,7 +556,7 @@
             const entry = document.createElement('div');
             entry.className = 'log-entry system-update';
             entry.innerHTML = `
-                <span class="log-time">📡 ${new Date().toLocaleTimeString('ar-EG')}</span>
+                <span class="log-time"> ${new Date().toLocaleTimeString('ar-EG')}</span>
                 <span>${message}</span>
             `;
             logContainer.prepend(entry);
@@ -572,6 +565,11 @@
                 logContainer.removeChild(logContainer.lastElementChild);
             }
         }
+
+        window.addEventListener('beforeunload', cleanup);
+        
+        initCamera();
+        initWebSocket();
     </script>
 </body>
 </html>

@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from .models import FaceLibrary, FaceProfile, AccessLog
 
 @admin.register(FaceProfile)

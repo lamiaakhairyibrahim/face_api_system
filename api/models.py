@@ -1,10 +1,12 @@
 from django.db import models
-import uuid
 from django.contrib.postgres.fields import ArrayField 
-from .tasks import calculate_embedding_task
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _ 
+from django.db import transaction
+import uuid
+
+from .tasks import calculate_embedding_task
 
 class FaceLibrary(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name=_("اسم المكتبة"))
@@ -41,6 +43,8 @@ class AccessLog(models.Model):
 @receiver(post_save, sender=FaceProfile)
 def process_face_on_save(sender, instance, created, **kwargs):
     if created:
-        calculate_embedding_task.delay(profile_id=instance.pk) 
-        print(f"ASYNC Signal: Task submitted for {instance.name} with PK={instance.pk}.")
+        transaction.on_commit(
+            lambda: calculate_embedding_task.delay(profile_id=instance.pk)
+        )
+        print(f"ASYNC Signal: Task submitted for {instance.name} with PK={instance.pk} (On Commit).")
 

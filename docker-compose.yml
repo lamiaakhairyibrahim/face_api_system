@@ -1,29 +1,54 @@
+version: '3.8'
 
 services:
+  # =====================================================
+  # PostgreSQL Database
+  # =====================================================
   db:
     image: postgres:14-alpine
     container_name: postgres_db
+    restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_INITDB_ARGS: "-E UTF8 --locale=en_US.UTF-8"
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    networks:
+      - app_network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
 
+  # =====================================================
+  # Redis Cache & Message Broker
+  # =====================================================
   redis:
-    image: redis:6-alpine
+    image: redis:7-alpine
     container_name: redis_broker
-    expose:
-      - 6379
+    restart: unless-stopped
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # =====================================================
+  # Django Application (GPU-enabled)
+  # =====================================================
   app:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
     container_name: django_app
-    restart: always
+    restart: unless-stopped
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
@@ -31,37 +56,120 @@ services:
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
       - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - DJANGO_SETTINGS_MODULE=face_ai.settings
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
     
     depends_on:
-      redis:
-        condition: service_started
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     
-    command: sh -c "python manage.py migrate && python manage.py collectstatic --noinput && daphne face_ai.asgi:application -b 0.0.0.0 -p 8000"
+    # GPU Configuration
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, compute, utility]
+    
+    command: >
+      sh -c "
+        echo 'Waiting for database...' &&
+        python manage.py migrate --noinput &&
+        echo 'Migrations done' &&
+        python manage.py collectstatic --noinput &&
+        echo 'Static files collected' &&
+        echo 'Starting Daphne server...' &&
+        daphne face_ai.asgi:application -b 0.0.0.0 -p 8000
+      "
     
     volumes:
-      - .:/app
       - media_files:/app/media
+      - static_files:/app/staticfiles
+      
     ports:
       - "8000:8000"
+    
+    networks:
+      - app_network
+    
+    mem_limit: 4g
+    memswap_limit: 4g
 
+  # =====================================================
+  # Celery Worker (GPU-enabled)
+  # =====================================================
   worker:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: celery_worker
-    command: celery -A face_ai worker -l info 
+    restart: unless-stopped
+    
+    # GPU Configuration
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, compute, utility]
+
+    command: >
+      sh -c "
+        echo 'Waiting for services...' &&
+        sleep 10 &&
+        echo 'Starting Celery worker...' &&
+        celery -A face_ai worker -l info --concurrency=4
+      "
+    
     environment:
       - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
       - REDIS_HOST=redis
+      - REDIS_PORT=6379
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_PORT=5432
+      - DJANGO_SETTINGS_MODULE=face_ai.settings
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    
     volumes:
       - media_files:/app/media
+    
     depends_on:
-      - app
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      app:
+        condition: service_started
+    
+    networks:
+      - app_network
+    
+    mem_limit: 4g
+    memswap_limit: 4g
 
+# =====================================================
+# Networks
+# =====================================================
+networks:
+  app_network:
+    driver: bridge
+
+# =====================================================
+# Volumes
+# =====================================================
 volumes:
   postgres_data:
+    driver: local
   media_files:
+    driver: local
+  static_files:
+    driver: local

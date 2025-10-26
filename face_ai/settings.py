@@ -5,13 +5,14 @@ from django.utils.translation import gettext_lazy as _
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get('SECRET_KEY', '')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-#6)$(gi^$pit*8g@ql9c@i3m!tj_o$^5k8z)@b_t)(h8nnqy%z')
 
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000']
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

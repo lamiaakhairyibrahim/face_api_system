@@ -1,12 +1,14 @@
-from rest_framework import viewsets
-from .models import FaceLibrary, FaceProfile, AccessLog
-from .serializers import FaceLibrarySerializer, FaceProfileSerializer, AccessLogSerializer
 from django.shortcuts import render
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.core.paginator import Paginator
 from django.utils import timezone
+
+from rest_framework import viewsets
+
+from .models import FaceLibrary, FaceProfile, AccessLog
+from .serializers import FaceLibrarySerializer, FaceProfileSerializer, AccessLogSerializer
 
 class FaceLibraryViewSet(viewsets.ModelViewSet):
     queryset = FaceLibrary.objects.all()
@@ -16,7 +18,6 @@ class FaceProfileViewSet(viewsets.ModelViewSet):
     queryset = FaceProfile.objects.all()
     serializer_class = FaceProfileSerializer
     
-
 class AccessLogViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = AccessLog.objects.all().order_by('-timestamp')
     serializer_class = AccessLogSerializer
